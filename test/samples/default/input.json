@@ -1,22 +1,19 @@
 {
-	"id": "http://yourdomain.com/schemas/myschema.json",
-	"description": "Example description",
-	"type": "object",
-	"properties": {
-		"first_name": {
-			"description": "the first name",
-			"type": "string",
-			"default": "bob"
-		},
-		"gender": {
-			"description": "the gender",
-			"type": "string",
-			"enum": [
-				"Male",
-				"Female"
-			],
-			"default": "Male"
-		}
-		
-	}
+  "$id": "http://yourdomain.com/schemas/v1/myschema.json",
+  "description": "Example description",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "description": "the first name",
+      "type": "string",
+      "default": "bob"
+    },
+    "gender": {
+      "description": "the gender",
+      "type": "string",
+      "enum": ["Male", "Female"],
+      "default": "Male"
+    }
+  },
+  "required": ["first_name", "gender"]
 }

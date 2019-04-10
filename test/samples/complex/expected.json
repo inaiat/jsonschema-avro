@@ -1,28 +1,36 @@
 {
-	"namespace": "http.yourdomain.com.schemas.myschema.json",
-	"name": "main",
-	"type": "record",
-	"doc": "Complex example",
-	"fields": [
-		{
-			"doc": "the address",
-			"name": "address",
-			"type": {
-				"type": "record",
-				"name": "address_record",
-				"fields": [
-					{
-						"doc": "the street address",
-						"name": "street_address",
-						"type": "string"
-					},
-					{
-						"doc": "the country",
-						"name": "country",
-						"type": "string"
-					}
-				]
-			}
-		}
-	]
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Complex example",
+  "fields": [
+    {
+      "doc": "the address",
+      "name": "address",
+      "type": {
+        "type": "record",
+        "name": "address_record",
+        "fields": [
+          {
+            "default": null,
+            "doc": "the street address",
+            "name": "street_address",
+            "type": ["null", "string"]
+          },
+          {
+            "default": null,
+            "doc": "the country",
+            "name": "country",
+            "type": ["null", "string"]
+          }
+        ]
+      }
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
+    }
+  ]
 }

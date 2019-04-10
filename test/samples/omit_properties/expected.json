@@ -1,6 +1,6 @@
 {
-  "namespace": "http.yourdomain.com.schemas.myschema.json",
-  "name": "main",
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
   "type": "record",
   "doc": "Example description",
   "fields": [
@@ -12,6 +12,12 @@
         "name": "body_record",
         "fields": []
       }
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
     }
   ]
 }

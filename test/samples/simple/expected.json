@@ -1,13 +1,20 @@
 {
-	"namespace": "http.yourdomain.com.schemas.myschema.json",
-	"name": "main",
-	"type": "record",
-	"doc": "Example description",
-	"fields": [
-		{
-			"doc": "the first name",
-			"name": "first_name",
-			"type": "string"
-		}
-	]
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Example description",
+  "fields": [
+    {
+      "default": null,
+      "doc": "the first name",
+      "name": "first_name",
+      "type": ["null", "string"]
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
+    }
+  ]
 }

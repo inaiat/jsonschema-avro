@@ -1,20 +1,27 @@
 {
-	"namespace": "http.yourdomain.com.schemas.myschema.json",
-	"name": "main",
-	"type": "record",
-	"doc": "Enum example",
-	"fields": [
-		{
-			"doc": "the gender",
-			"name": "gender",
-			"type": {
-				"name": "gender_enum",
-				"symbols": [
-					"Male",
-					"Female"
-				],
-				"type": "enum"
-			}
-		}
-	]
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Enum example",
+  "fields": [
+    {
+      "default": null,
+      "doc": "the gender",
+      "name": "gender",
+      "type": [
+        "null",
+        {
+          "name": "gender_enum",
+          "symbols": ["Male", "Female"],
+          "type": "enum"
+        }
+      ]
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
+    }
+  ]
 }

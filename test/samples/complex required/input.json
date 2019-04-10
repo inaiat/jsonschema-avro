@@ -15,8 +15,8 @@
           "description": "the country",
           "type": "string"
         }
-      }
+      },
+      "required": ["country"]
     }
-  },
-  "required": ["address"]
+  }
 }

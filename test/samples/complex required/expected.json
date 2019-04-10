@@ -1,0 +1,39 @@
+{
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Complex example",
+  "fields": [
+    {
+      "default": null,
+      "doc": "the address",
+      "name": "address",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "address_record",
+          "fields": [
+            {
+              "default": null,
+              "doc": "the street address",
+              "name": "street_address",
+              "type": ["null", "string"]
+            },
+            {
+              "doc": "the country",
+              "name": "country",
+              "type": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
+    }
+  ]
+}

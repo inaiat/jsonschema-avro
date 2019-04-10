@@ -12,9 +12,15 @@
         },
         "type": "array"
       }
+    },
+    {
+      "doc": "Event timestamp",
+      "logicalType": "timestamp-millis",
+      "name": "_timestamp",
+      "type": "long"
     }
   ],
-  "name": "main",
-  "namespace": "http.yourdomain.com.schemas.myschema.json",
+  "name": "Myschema",
+  "namespace": "com.yourdomain.schemas",
   "type": "record"
 }

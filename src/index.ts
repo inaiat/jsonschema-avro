@@ -1,119 +1,257 @@
-const jsonSchemaAvro = module.exports = {}
+import { IAvroProp, JSONSchemaTypes } from './interfaces';
+import { parse } from 'url';
+import { JSONSchema7 } from 'json-schema';
+
+const firstToUpper = (str: string) => `${str[0].toUpperCase()}${str.slice(1)}`;
+
+const normalizeName = (fileName: string) =>
+  fileName
+    .split('-')
+    .map(firstToUpper)
+    .join('');
+
+const getName = ($id: string) =>
+  $id.replace(RE_FILENAME, (_, p1, p2) => normalizeName(p2));
+
+enum AvroTypes {
+  Null = 'null',
+  String = 'string',
+  Boolean = 'boolean',
+  Integer = 'int',
+  Number = 'float',
+  Long = 'long',
+  Record = 'record',
+  Array = 'array',
+  Enum = 'enum',
+}
 
 // Json schema on the left, avro on the right
-const typeMapping = {
-	'string': 'string',
-	'null': 'null',
-	'boolean': 'boolean',
-	'integer': 'int',
-	'number': 'float'
-}
+const typeMapping: {
+  [key: string]: string;
+} = {
+  string: AvroTypes.String,
+  null: AvroTypes.Null,
+  boolean: AvroTypes.Boolean,
+  integer: AvroTypes.Integer,
+  number: AvroTypes.Number,
+};
 
-const reSymbol = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const RE_SYMBOL = /^[A-Za-z_][A-Za-z0-9_]*$/;
+const RE_NAMESPACE = /(.*)\/(v\d)\/.*/i;
+const RE_ESCAPE = /([^a-z0-9]+)/gi;
+const RE_FILENAME = /.*\/(v\d)\/([a-z-]*).json/i;
 
-jsonSchemaAvro.convert = (jsonSchema, name = 'main') => {
-	if(!jsonSchema){
-		throw new Error('No schema given')
-	}
-	return {
-		namespace: jsonSchemaAvro._convertId(jsonSchema.id),
-		name: name,
-		type: 'record',
-		doc: jsonSchema.description,
-		fields: jsonSchema.properties ? jsonSchemaAvro._convertProperties(jsonSchema.properties) : []
-	}
-}
+const timestamp = {
+  name: '_timestamp',
+  type: AvroTypes.Long,
+  logicalType: 'timestamp-millis',
+  doc: 'Event timestamp',
+};
 
-jsonSchemaAvro._convertId = (id) => {
-	return id ? id.replace(/([^a-z0-9]+)/ig, '.') : id
-}
+const getTopLevelFields = ({ properties, required }: JSONSchema7) => {
+  if (!properties) {
+    return [timestamp];
+  }
 
-jsonSchemaAvro._isComplex = (schema) => {
-	return schema.type === 'object'
-}
+  return [...convertProperties(properties, required), timestamp];
+};
 
-jsonSchemaAvro._isArray = (schema) => {
-	return schema.type === 'array'
-}
+export const convert = (jsonSchema: JSONSchema7) => {
+  if (!jsonSchema) {
+    throw new Error('No schema given');
+  }
 
-jsonSchemaAvro._hasEnum = (schema) => {
-	return Boolean(schema.enum)
-}
+  if (!jsonSchema.$id) {
+    throw new Error(
+      'No $id provided for schema: https://json-schema.org/understanding-json-schema/basics.html#declaring-a-unique-identifier',
+    );
+  }
 
-jsonSchemaAvro._convertProperties = (schema) => {
-	return Object.keys(schema).map((item) => {
-		if(jsonSchemaAvro._isComplex(schema[item])){
-			return jsonSchemaAvro._convertComplexProperty(item, schema[item])
-		}
-		else if (jsonSchemaAvro._isArray(schema[item])) {
-			return jsonSchemaAvro._convertArrayProperty(item, schema[item])
-		}
-		else if(jsonSchemaAvro._hasEnum(schema[item])){
-			return jsonSchemaAvro._convertEnumProperty(item, schema[item])
-		}
-		return jsonSchemaAvro._convertProperty(item, schema[item])
-	})
-}
+  return {
+    namespace: getNamespace(jsonSchema.$id),
+    name: getName(jsonSchema.$id),
+    type: AvroTypes.Record,
+    doc: jsonSchema.description,
+    fields: getTopLevelFields(jsonSchema),
+  };
+};
 
-jsonSchemaAvro._convertComplexProperty = (name, contents) => {
-	return {
-		name: name,
-		doc: contents.description || '',
-		type: {
-			type: 'record',
-			name: `${name}_record`,
-			fields: jsonSchemaAvro._convertProperties(contents.properties || {})
-		}
-	}
-}
+const getNamespace = (id: string = '') => {
+  const url = parse(id);
 
-jsonSchemaAvro._convertArrayProperty = (name, contents) => {
-	return {
-		name: name,
-		doc: contents.description || '',
-		type: {
-			type: 'array',
-			items: jsonSchemaAvro._isComplex(contents.items)
-				? {
-					type: 'record',
-					name: `${name}_record`,
-					fields: jsonSchemaAvro._convertProperties(contents.items.properties || {})
-				}
-				: jsonSchemaAvro._convertProperty(name, contents.items)
-		}
-	}
-}
+  if (!url.host) {
+    throw new Error(
+      'Every top-level schema should set $id to an absolute URI: https://json-schema.org/understanding-json-schema/structuring.html#id',
+    );
+  }
 
-jsonSchemaAvro._convertEnumProperty = (name, contents) => {
-	const valid = contents.enum.every((symbol) => reSymbol.test(symbol))
-	let prop = {
-		name: name,
-		doc: contents.description || '',
-		type: valid ? {
-			type: 'enum',
-			name: `${name}_enum`,
-			symbols: contents.enum
-		} : 'string'
-	}
-	if(contents.hasOwnProperty('default')){
-		prop.default = contents.default
-	}
-	return prop
-}
+  const reversedHost = url.host.split('.').reverse();
 
-jsonSchemaAvro._convertProperty = (name, value) => {
-	let prop = {
-		name: name,
-		doc: value.description || ''
-	}
-	if(value.hasOwnProperty('default')){
-		prop.default = value.default
-	}
-	if(Array.isArray(value.type)){
-		prop.type = value.type.map(type => typeMapping[type])
-	}
-	else{
-		prop.type = typeMapping[value.type]
-	}
-	return prop
-}
+  if (!url.path) {
+    return reversedHost.join('.');
+  }
+
+  return reversedHost
+    .concat(
+      url
+        .path!.replace(RE_NAMESPACE, (_, p1) => p1)
+        .replace(RE_ESCAPE, '.')
+        .slice(1),
+    )
+    .join('.');
+};
+
+const isComplex = (schema: any) => {
+  return schema.type === 'object';
+};
+
+const isArray = (schema: any) => {
+  return schema.type === 'array';
+};
+
+const hasEnum = (schema: any) => {
+  return Boolean(schema.enum);
+};
+
+const convertProperties = (schema: any, required: string[] = []): any => {
+  return Object.keys(schema).map(item => {
+    const isRequired = Boolean(required.find(key => key === item));
+
+    if (isComplex(schema[item])) {
+      return convertComplexProperty(item, schema[item], isRequired);
+    } else if (isArray(schema[item])) {
+      return convertArrayProperty(item, schema[item], isRequired);
+    } else if (hasEnum(schema[item])) {
+      return convertEnumProperty(item, schema[item], isRequired);
+    }
+
+    return convertProperty(item, schema[item], isRequired);
+  });
+};
+
+const convertComplexProperty = (
+  name: string,
+  contents: any,
+  isRequired: boolean = false,
+) => {
+  const type = {
+    type: AvroTypes.Record,
+    name: `${name}_record`,
+    fields: convertProperties(contents.properties || {}, contents.required),
+  };
+
+  return {
+    name,
+    doc: contents.description || '',
+    ...resolveRequiredType(type, isRequired),
+  };
+};
+
+const convertArrayProperty = (
+  name: string,
+  contents: any,
+  isRequired: boolean,
+) => {
+  const type = {
+    type: AvroTypes.Array,
+    items: isComplex(contents.items)
+      ? {
+          type: AvroTypes.Record,
+          name: `${name}_record`,
+          fields: convertProperties(
+            contents.items.properties || {},
+            contents.items.required,
+          ),
+        }
+      : convertProperty(name, contents.items, true),
+  };
+
+  return {
+    name,
+    doc: contents.description || '',
+    ...resolveRequiredType(type, isRequired),
+  };
+};
+
+const convertEnumProperty = (
+  name: string,
+  contents: any,
+  isRequired: boolean = false,
+) => {
+  const valid = contents.enum.every((symbol: any) => RE_SYMBOL.test(symbol));
+  const type = valid
+    ? {
+        type: AvroTypes.Enum,
+        name: `${name}_enum`,
+        symbols: contents.enum,
+      }
+    : AvroTypes.String;
+  const prop: any = {
+    name,
+    doc: contents.description || '',
+    ...resolveRequiredType(type, isRequired),
+  };
+
+  if (contents.hasOwnProperty('default')) {
+    prop.default = contents.default;
+  }
+
+  return prop;
+};
+
+const convertProperty = (
+  name: string,
+  value: {
+    description?: string;
+    default?: any;
+    type: JSONSchemaTypes | JSONSchemaTypes[];
+  },
+  isRequired: boolean = false,
+) => {
+  const prop: IAvroProp = {
+    name,
+    doc: value.description || '',
+  };
+
+  const { type, default: defaultValue } = resolveRequiredType(
+    getTypeForProp(value),
+    isRequired,
+  );
+
+  prop.type = type;
+
+  if (defaultValue !== undefined) {
+    prop.default = defaultValue;
+  }
+
+  if (value.hasOwnProperty('default')) {
+    prop.default = value.default;
+  }
+
+  return prop;
+};
+
+const getTypeForProp = (value: any): any => {
+  if (Array.isArray(value.type)) {
+    return value.type.map((type: JSONSchemaTypes) => typeMapping[type]);
+  }
+
+  return typeMapping[value.type];
+};
+
+const resolveRequiredType = (type: any, isRequired: boolean) => {
+  const calculatedType = isRequired
+    ? type
+    : Array.isArray(type)
+    ? [AvroTypes.Null, ...type.filter((k: any) => k !== AvroTypes.Null)]
+    : [AvroTypes.Null, type];
+
+  if (calculatedType[0] === AvroTypes.Null) {
+    return {
+      type: calculatedType,
+      default: null,
+    };
+  }
+
+  return { type };
+};

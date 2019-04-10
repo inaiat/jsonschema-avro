@@ -1,10 +1,11 @@
 {
-	"id": "http://yourdomain.com/schemas/myschema.json",
-	"description": "Example description",
-	"type": "object",
-	"properties": {
-		"body": {
-			"type": "object"
-		}
-	}
+  "$id": "http://yourdomain.com/schemas/v1/myschema.json",
+  "description": "Example description",
+  "type": "object",
+  "properties": {
+    "body": {
+      "type": "object"
+    }
+  },
+  "required": ["body"]
 }

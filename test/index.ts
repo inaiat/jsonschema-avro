@@ -1,51 +1,61 @@
-const jsonSchemaAvro = require('../src/index')
-const assert = require('assert')
-const fs = require('fs')
+import { convert } from '../src';
+import assert from 'assert';
+import { readFileSync, readdirSync } from 'fs';
+import { join } from 'path';
+import { JSONSchema7 } from 'json-schema';
+const sampleDir = 'test/samples';
 
-describe('index', () => {
+const readJSONFile = (filename: string) =>
+  JSON.parse(readFileSync(filename, { encoding: 'utf8' }));
 
-	describe('convert()', () => {
-		const sampleDir = './test/samples'
-		const testDirs = fs.readdirSync(sampleDir)
+const readTestData = (dir: string) => ({
+  schema: readJSONFile(join(process.cwd(), sampleDir, dir, 'input.json')),
+  expected: readJSONFile(join(process.cwd(), sampleDir, dir, 'expected.json')),
+});
 
-		testDirs.forEach(dir => {
+describe('json-schema-avro', () => {
+  describe('convert()', () => {
+    const testDirs = readdirSync(join(process.cwd(), sampleDir));
 
-			describe(dir, () => {
-				const inJson = require(`../${sampleDir}/${dir}/input.json`)
-				const expected = require(`../${sampleDir}/${dir}/expected.json`)
-				let result
+    testDirs.forEach((dir: string) => {
+      describe(dir, () => {
+        const { schema, expected } = readTestData(dir);
+        let result: any;
 
-				before(() => {
-					result = jsonSchemaAvro.convert(inJson)
-				})
+        before(() => {
+          result = convert(schema);
+        });
 
-				it('converts to avro', () => {
-					//console.log(JSON.stringify(result, null, 2))
-					assert.deepEqual(result, expected)
-				})
-			})
-			
-		})
+        it('converts to avro', () => {
+          assert.deepEqual(result, expected);
+        });
+      });
+    });
 
-		it('should allow to override output avro schema name', () => {
-			const schema = {
-			  id: 'http://yourdomain.com/schemas/myschema.json',
-			  type: 'object',
-			  description: 'foo',
-			}
-			const name = 'bar'
-			const expected = {
-			  doc: 'foo',
-			  fields: [],
-			  type: 'record',
-			  name: 'bar',
-			  namespace: 'http.yourdomain.com.schemas.myschema.json',
-			}
-	  
-			const result = jsonSchemaAvro.convert(schema, name)
-	  
-			assert.deepEqual(result, expected)
-		  })
+    it('should allow to define namespace with $id', () => {
+      const schema: JSONSchema7 = {
+        $id: 'http://yourdomain.com/schemas/v1/myschema.json',
+        type: 'object',
+        description: 'foo',
+      };
+      const expected = {
+        doc: 'foo',
+        fields: [
+          {
+            doc: 'Event timestamp',
+            logicalType: 'timestamp-millis',
+            name: '_timestamp',
+            type: 'long',
+          },
+        ],
+        type: 'record',
+        name: 'Myschema',
+        namespace: 'com.yourdomain.schemas',
+      };
 
-	})
-})
+      const result = convert(schema);
+
+      assert.deepEqual(result, expected);
+    });
+  });
+});
