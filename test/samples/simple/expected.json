@@ -8,13 +8,10 @@
       "default": null,
       "doc": "the first name",
       "name": "first_name",
-      "type": ["null", "string"]
-    },
-    {
-      "doc": "Event timestamp",
-      "logicalType": "timestamp-millis",
-      "name": "_timestamp",
-      "type": "long"
+      "type": [
+        "null",
+        "string"
+      ]
     }
   ]
 }

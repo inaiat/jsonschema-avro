@@ -12,12 +12,6 @@
         "name": "body_record",
         "fields": []
       }
-    },
-    {
-      "doc": "Event timestamp",
-      "logicalType": "timestamp-millis",
-      "name": "_timestamp",
-      "type": "long"
     }
   ]
 }

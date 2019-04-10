@@ -21,6 +21,7 @@ export interface IAvroProp {
   doc: string;
   default?: any;
   type?: IAvroType;
+  logicalType?: string;
 }
 
 export type JSONSchemaTypes =
@@ -40,4 +41,8 @@ export interface IJSONSchema {
   required?: string[];
   $id: string;
   description: string;
+}
+
+export interface IConvertationOptions {
+  additionalFields?: IAvroProp[];
 }

@@ -16,7 +16,12 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "resolveJsonModule": true,
-    "typeRoots": ["node_modules/@types", "typings"]
+    "typeRoots": [
+      "node_modules/@types",
+      "typings"
+    ]
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

@@ -1,6 +1,7 @@
-import { IAvroProp, JSONSchemaTypes } from './interfaces';
+import { IAvroProp, JSONSchemaTypes, IConvertationOptions } from './interfaces';
 import { parse } from 'url';
 import { JSONSchema7 } from 'json-schema';
+import { AvroTypes } from './AvroTypes.enum';
 
 const firstToUpper = (str: string) => `${str[0].toUpperCase()}${str.slice(1)}`;
 
@@ -12,18 +13,6 @@ const normalizeName = (fileName: string) =>
 
 const getName = ($id: string) =>
   $id.replace(RE_FILENAME, (_, p1, p2) => normalizeName(p2));
-
-enum AvroTypes {
-  Null = 'null',
-  String = 'string',
-  Boolean = 'boolean',
-  Integer = 'int',
-  Number = 'float',
-  Long = 'long',
-  Record = 'record',
-  Array = 'array',
-  Enum = 'enum',
-}
 
 // Json schema on the left, avro on the right
 const typeMapping: {
@@ -41,22 +30,21 @@ const RE_NAMESPACE = /(.*)\/(v\d)\/.*/i;
 const RE_ESCAPE = /([^a-z0-9]+)/gi;
 const RE_FILENAME = /.*\/(v\d)\/([a-z-]*).json/i;
 
-const timestamp = {
-  name: '_timestamp',
-  type: AvroTypes.Long,
-  logicalType: 'timestamp-millis',
-  doc: 'Event timestamp',
-};
-
-const getTopLevelFields = ({ properties, required }: JSONSchema7) => {
+const getTopLevelFields = (
+  { properties, required }: JSONSchema7,
+  additionalFields: IAvroProp[] = [],
+) => {
   if (!properties) {
-    return [timestamp];
+    return [...additionalFields];
   }
 
-  return [...convertProperties(properties, required), timestamp];
+  return [...convertProperties(properties, required), ...additionalFields];
 };
 
-export const convert = (jsonSchema: JSONSchema7) => {
+export const convert = (
+  jsonSchema: JSONSchema7,
+  options: IConvertationOptions = {},
+) => {
   if (!jsonSchema) {
     throw new Error('No schema given');
   }
@@ -72,7 +60,7 @@ export const convert = (jsonSchema: JSONSchema7) => {
     name: getName(jsonSchema.$id),
     type: AvroTypes.Record,
     doc: jsonSchema.description,
-    fields: getTopLevelFields(jsonSchema),
+    fields: getTopLevelFields(jsonSchema, options.additionalFields),
   };
 };
 
@@ -85,13 +73,13 @@ const getNamespace = (id: string = '') => {
     );
   }
 
-  const reversedHost = url.host.split('.').reverse();
+  const prefix = url.host.split('.').reverse();
 
   if (!url.path) {
-    return reversedHost.join('.');
+    return prefix.join('.');
   }
 
-  return reversedHost
+  return prefix
     .concat(
       url
         .path!.replace(RE_NAMESPACE, (_, p1) => p1)

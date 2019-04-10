@@ -25,12 +25,6 @@
           }
         ]
       }
-    },
-    {
-      "doc": "Event timestamp",
-      "logicalType": "timestamp-millis",
-      "name": "_timestamp",
-      "type": "long"
     }
   ]
 }

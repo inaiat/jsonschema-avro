@@ -8,13 +8,11 @@
       "default": null,
       "doc": "the age",
       "name": "age",
-      "type": ["null", "float", "int"]
-    },
-    {
-      "doc": "Event timestamp",
-      "logicalType": "timestamp-millis",
-      "name": "_timestamp",
-      "type": "long"
+      "type": [
+        "null",
+        "float",
+        "int"
+      ]
     }
   ]
 }

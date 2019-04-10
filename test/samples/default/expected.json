@@ -19,12 +19,6 @@
         "type": "enum"
       },
       "default": "Male"
-    },
-    {
-      "doc": "Event timestamp",
-      "logicalType": "timestamp-millis",
-      "name": "_timestamp",
-      "type": "long"
     }
   ]
 }

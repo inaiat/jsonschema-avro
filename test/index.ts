@@ -40,6 +40,25 @@ describe('json-schema-avro', () => {
       };
       const expected = {
         doc: 'foo',
+        fields: [],
+        type: 'record',
+        name: 'Myschema',
+        namespace: 'com.yourdomain.schemas',
+      };
+
+      const result = convert(schema);
+
+      assert.deepEqual(result, expected);
+    });
+
+    it('should allow to pass additional fields', () => {
+      const schema: JSONSchema7 = {
+        $id: 'http://yourdomain.com/schemas/v1/myschema.json',
+        type: 'object',
+        description: 'foo',
+      };
+      const expected = {
+        doc: 'foo',
         fields: [
           {
             doc: 'Event timestamp',
@@ -53,7 +72,16 @@ describe('json-schema-avro', () => {
         namespace: 'com.yourdomain.schemas',
       };
 
-      const result = convert(schema);
+      const result = convert(schema, {
+        additionalFields: [
+          {
+            doc: 'Event timestamp',
+            logicalType: 'timestamp-millis',
+            name: '_timestamp',
+            type: 'long',
+          },
+        ],
+      });
 
       assert.deepEqual(result, expected);
     });
