@@ -12,12 +12,12 @@
     "url": "https://github.com/katsanva/jsonschema-avro/issues"
   },
   "version": "1.0.0",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "NODE_ENV=test nyc mocha 'test/*.ts'",
     "prepare": "npm run build",
-    "build": "tsc --declaration src/index.ts",
+    "build": "rm -rf dist && tsc -p . --declaration",
     "lint": "tslint -p .",
     "lint:fix": "npm run lint -- --fix"
   },
@@ -36,6 +36,9 @@
     "ts-node": "^8.0.3",
     "tslint": "^5.15.0",
     "typescript": "^3.4.3"
+  },
+  "peerDependencies": {
+    "tslib": "^1.9.3"
   },
   "keywords": [
     "avro",

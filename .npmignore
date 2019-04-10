@@ -1,6 +1,5 @@
 *
 !package-lock.json
 !package.json
-!src/*.js
-!src/*.d.ts
+!dist/*
 !README.md
