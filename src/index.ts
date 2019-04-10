@@ -2,6 +2,7 @@ import { IAvroProp, JSONSchemaTypes, IConvertationOptions } from './interfaces';
 import { parse } from 'url';
 import { JSONSchema7 } from 'json-schema';
 import { AvroTypes } from './AvroTypes.enum';
+import { AvroLogicalTypes } from './AvroLogicalTypes.enum';
 
 const firstToUpper = (str: string) => `${str[0].toUpperCase()}${str.slice(1)}`;
 
@@ -243,3 +244,5 @@ const resolveRequiredType = (type: any, isRequired: boolean) => {
 
   return { type };
 };
+
+export { AvroTypes, AvroLogicalTypes };
