@@ -1,0 +1,57 @@
+{
+  "$id": "http://yourdomain.com/schemas/v1/myschema.json",
+  "description": "Complex example",
+  "type": "object",
+  "properties": {
+    "work": {
+      "description": "the work address",
+      "type": "object",
+      "properties": {
+        "address": {
+          "description": "the address",
+          "type": "object",
+          "properties": {
+            "street_address": {
+              "description": "the street address",
+              "type": "string"
+            },
+            "country": {
+              "description": "the country",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "address"
+      ]
+    },
+    "home": {
+      "description": "the home address",
+      "type": "object",
+      "properties": {
+        "address": {
+          "description": "the address",
+          "type": "object",
+          "properties": {
+            "street_address": {
+              "description": "the street address",
+              "type": "string"
+            },
+            "country": {
+              "description": "the country",
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "address"
+      ]
+    }
+  },
+  "required": [
+    "work",
+    "home"
+  ]
+}

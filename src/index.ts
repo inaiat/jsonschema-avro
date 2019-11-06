@@ -1,8 +1,14 @@
 import { IAvroProp, JSONSchemaTypes, IConvertationOptions } from './interfaces';
 import { parse } from 'url';
+import { createHash } from 'crypto';
 import { JSONSchema7 } from 'json-schema';
 import { AvroTypes } from './AvroTypes.enum';
 import { AvroLogicalTypes } from './AvroLogicalTypes.enum';
+
+const md5 = (data: any) =>
+  createHash('md5')
+    .update(data)
+    .digest('hex');
 
 const firstToUpper = (str: string) => `${str[0].toUpperCase()}${str.slice(1)}`;
 
@@ -102,14 +108,18 @@ const hasEnum = (schema: any) => {
   return Boolean(schema.enum);
 };
 
-const convertProperties = (schema: any, required: string[] = []): any => {
+const convertProperties = (
+  schema: any,
+  required: string[] = [],
+  parent = '',
+): any => {
   return Object.keys(schema).map(item => {
     const isRequired = Boolean(required.find(key => key === item));
 
     if (isComplex(schema[item])) {
-      return convertComplexProperty(item, schema[item], isRequired);
+      return convertComplexProperty(item, schema[item], isRequired, parent);
     } else if (isArray(schema[item])) {
-      return convertArrayProperty(item, schema[item], isRequired);
+      return convertArrayProperty(item, schema[item], isRequired, parent);
     } else if (hasEnum(schema[item])) {
       return convertEnumProperty(item, schema[item], isRequired);
     }
@@ -118,16 +128,31 @@ const convertProperties = (schema: any, required: string[] = []): any => {
   });
 };
 
+const getComplexType = (
+  simpleName: string,
+  contents: { properties?: any; required?: string[] },
+  parent: string,
+) => {
+  const name = parent ? `${simpleName}_${md5(parent)}` : `${simpleName}_record`;
+
+  return {
+    type: AvroTypes.Record,
+    name,
+    fields: convertProperties(
+      contents.properties || {},
+      contents.required,
+      name,
+    ),
+  };
+};
+
 const convertComplexProperty = (
   name: string,
   contents: any,
   isRequired: boolean = false,
+  item: string,
 ) => {
-  const type = {
-    type: AvroTypes.Record,
-    name: `${name}_record`,
-    fields: convertProperties(contents.properties || {}, contents.required),
-  };
+  const type = getComplexType(name, contents, item);
 
   return {
     name,
@@ -140,18 +165,12 @@ const convertArrayProperty = (
   name: string,
   contents: any,
   isRequired: boolean,
+  item: string,
 ) => {
   const type = {
     type: AvroTypes.Array,
     items: isComplex(contents.items)
-      ? {
-          type: AvroTypes.Record,
-          name: `${name}_record`,
-          fields: convertProperties(
-            contents.items.properties || {},
-            contents.items.required,
-          ),
-        }
+      ? getComplexType(name, contents.items, item)
       : convertProperty(name, contents.items, true),
   };
 

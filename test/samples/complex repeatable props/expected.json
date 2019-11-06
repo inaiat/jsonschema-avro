@@ -1,0 +1,84 @@
+{
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Complex example",
+  "fields": [
+    {
+      "doc": "the work address",
+      "name": "work",
+      "type": {
+        "type": "record",
+        "name": "work_record",
+        "fields": [
+          {
+            "doc": "the address",
+            "name": "address",
+            "type": {
+              "type": "record",
+              "name": "address_e22d0a8c24a8ca66665e365f207acfac",
+              "fields": [
+                {
+                  "default": null,
+                  "doc": "the street address",
+                  "name": "street_address",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                {
+                  "default": null,
+                  "doc": "the country",
+                  "name": "country",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "doc": "the home address",
+      "name": "home",
+      "type": {
+        "type": "record",
+        "name": "home_record",
+        "fields": [
+          {
+            "doc": "the address",
+            "name": "address",
+            "type": {
+              "type": "record",
+              "name": "address_2f66e2c85c3be07445a8007e07961bf7",
+              "fields": [
+                {
+                  "default": null,
+                  "doc": "the street address",
+                  "name": "street_address",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                {
+                  "default": null,
+                  "doc": "the country",
+                  "name": "country",
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
