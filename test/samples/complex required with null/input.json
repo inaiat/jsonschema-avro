@@ -1,0 +1,23 @@
+{
+  "$id": "http://yourdomain.com/schemas/v1/myschema.json",
+  "description": "Complex example",
+  "type": "object",
+  "properties": {
+    "address": {
+      "description": "the address",
+      "type": "object",
+      "properties": {
+        "street_address": {
+          "description": "the street address",
+          "type": "string",
+          "default": "Parkway drive"
+        },
+        "country": {
+          "description": "the country",
+          "type": "string"
+        }
+      },
+      "required": ["country"]
+    }
+  }
+}

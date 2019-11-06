@@ -205,6 +205,7 @@ const convertProperty = (
   const { type, default: defaultValue } = resolveRequiredType(
     getTypeForProp(value),
     isRequired,
+    value.default,
   );
 
   prop.type = type;
@@ -228,12 +229,35 @@ const getTypeForProp = (value: any): any => {
   return typeMapping[value.type];
 };
 
-const resolveRequiredType = (type: any, isRequired: boolean) => {
-  const calculatedType = isRequired
-    ? type
-    : Array.isArray(type)
-    ? [AvroTypes.Null, ...type.filter((k: any) => k !== AvroTypes.Null)]
-    : [AvroTypes.Null, type];
+const resolveRequiredType = (
+  type: any,
+  isRequired: boolean,
+  defaultValue?: any,
+) => {
+  let calculatedType;
+  const isDefaulted = typeof defaultValue !== 'undefined';
+
+  if (isRequired) {
+    calculatedType = type;
+  } else {
+    if (isDefaulted) {
+      if (Array.isArray(type)) {
+        calculatedType = [
+          ...type.filter((k: any) => k !== AvroTypes.Null),
+          AvroTypes.Null,
+        ];
+      } else {
+        calculatedType = [type, AvroTypes.Null];
+      }
+    } else if (Array.isArray(type)) {
+      calculatedType = [
+        AvroTypes.Null,
+        ...type.filter((k: any) => k !== AvroTypes.Null),
+      ];
+    } else {
+      calculatedType = [AvroTypes.Null, type];
+    }
+  }
 
   if (calculatedType[0] === AvroTypes.Null) {
     return {
@@ -242,7 +266,14 @@ const resolveRequiredType = (type: any, isRequired: boolean) => {
     };
   }
 
-  return { type };
+  if (typeof defaultValue !== 'undefined') {
+    return {
+      type: calculatedType,
+      default: defaultValue,
+    };
+  }
+
+  return { type: calculatedType };
 };
 
 export { AvroTypes, AvroLogicalTypes };

@@ -1,0 +1,36 @@
+{
+  "namespace": "com.yourdomain.schemas",
+  "name": "Myschema",
+  "type": "record",
+  "doc": "Complex example",
+  "fields": [
+    {
+      "default": null,
+      "doc": "the address",
+      "name": "address",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "address_record",
+          "fields": [
+            {
+              "default": "Parkway drive",
+              "doc": "the street address",
+              "name": "street_address",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            {
+              "doc": "the country",
+              "name": "country",
+              "type": "string"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
