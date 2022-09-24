@@ -1,3 +1,5 @@
+import { AvroTypes } from './avro-types.enum';
+
 interface IAvroEnumType {
   type: 'enum';
   name: string;
@@ -14,7 +16,7 @@ type IAvroType =
   | string
   | IAvroEnumType
   | IAvroRecordType
-  | Array<string | IAvroEnumType | IAvroRecordType>;
+  | (string | IAvroEnumType | IAvroRecordType)[];
 
 export interface IAvroProp {
   name: string;
@@ -45,4 +47,12 @@ export interface IJSONSchema {
 
 export interface IConvertationOptions {
   additionalFields?: IAvroProp[];
+}
+
+export type AvroSchemaResult = {
+  namespace?: string,
+  name: string,
+  type: AvroTypes.Record,
+  doc?: string,
+  fields: unknown[]
 }
