@@ -1,9 +1,9 @@
-import { IAvroProp, IConvertationOptions } from './interfaces';
-import { parse } from 'url';
+import { IAvroProp, IConvertationOptions } from './types.js';
+import { parse } from 'node:url';
 import { JSONSchema7 } from 'json-schema';
-import { AvroTypes } from './avro-types.enum';
-import { AvroLogicalTypes } from './avro-logical-types.enum';
-import { convertProperties, getValuable, normalizeName } from './avro-helpers';
+import { AvroTypes } from './avro-types.enum.js';
+import { AvroLogicalTypes } from './avro-logical-types.enum.js';
+import { convertProperties, getValuable, normalizeName } from './avro-helpers.js';
 
 const RE_NAMESPACE = /(.*)\/(v\d)\/.*/i;
 const RE_ESCAPE = /([^a-z0-9]+)/gi;
@@ -67,3 +67,5 @@ export const convert = (
 };
 
 export { AvroTypes, AvroLogicalTypes };
+
+export * from './types.js'

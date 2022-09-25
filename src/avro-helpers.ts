@@ -1,6 +1,6 @@
-import { IAvroProp, JSONSchemaTypes, AvroSchemaResult } from './interfaces';
+import { IAvroProp, JSONSchemaTypes, AvroSchemaResult } from './types.js';
 import { createHash } from 'crypto';
-import { AvroTypes } from './avro-types.enum';
+import { AvroTypes } from './avro-types.enum.js';
 
 const RE_SYMBOL = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
