@@ -3,7 +3,8 @@
     "importHelpers": true,
     "strict": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -13,9 +14,10 @@
     "target": "esnext",
     "sourceMap": true,
     "watch": false,
-    "outDir": "./dist",
-    "baseUrl": "./src",
+    "outDir": "dist",
+    "baseUrl": "src",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "node_modules/@types",
       "typings"

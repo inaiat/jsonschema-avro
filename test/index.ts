@@ -1,7 +1,7 @@
-import { convert } from '../src';
+import { convert } from '../src/index.js';
 import assert from 'assert';
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { JSONSchema7 } from 'json-schema';
 const sampleDir = 'test/samples';
 
