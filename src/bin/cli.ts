@@ -1,44 +1,10 @@
 #!/usr/bin/env ts-node-esm
 
-import { Logger } from '../types.js';
-import yargs, { Argv } from 'yargs';
+import { Logger, parseArgs } from './utils.js';
+
 import { loadConfig, writeSchemas } from './avro-schema-gen.js';
 
-
-const validCommands = ['generate'] as const
-type Command = typeof validCommands[number]
-
-async function parseArgs(args: string[]): Promise<{
-  parsedYargs: Argv<{ config: string | undefined }>
-  command: Command
-}> {
-  const parsedYargs = yargs(args)
-    .option('config', {
-      alias: 'c',
-      type: 'string',
-      description: 'path to the configuration file',
-    })
-    .command('generate', 'write model schemas to local files', {
-      dryRun: { type: 'boolean' },
-    })
-    .demandCommand(
-      1,
-      1,
-      'One of the above commands must be specified',
-      'Only one command can be specified'
-    )
-    .strict()
-    .help('h')
-    .showHelpOnFail(true)
-
-  const argv = await parsedYargs.argv
-
-  const command = `${argv._[0]}` as Command
-
-  return { parsedYargs, command }
-}
-
-async function jsonSchemaAvroGenerate(
+async function jsonSchemaAvroGenerator(
   processArgv: string[],
   processExitFn: (code?: number) => never,
   logger: Logger
@@ -49,15 +15,19 @@ async function jsonSchemaAvroGenerate(
     helpPrinter = parsedYargs
     const argv = await parsedYargs.argv
     const { config } = await loadConfig(argv.config)
-    writeSchemas(config, logger)
+
+    if (command === 'generate') {
+        await writeSchemas(config, logger)
+    } else {
+        await writeSchemas(config, logger, true)
+    }
 
   } catch (error) {
     logger.error(error)
-    throw error
+    processExitFn(1)
   }
-
 }
 
-jsonSchemaAvroGenerate(process.argv, process.exit, console)
+jsonSchemaAvroGenerator(process.argv, process.exit, console)
 
 

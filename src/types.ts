@@ -58,28 +58,6 @@ export type AvroSchemaResult = {
   fields: unknown[]
 }
 
-// export interface Config {
-//   /**
-//    * An array of dictionaries, for each of your schema files,
-//    * containing the class and optionally a custom avsc file name.
-//    */
-//   models: {
-//     /** The decorated typescript class of the model */
-//     class: Constructable<unknown>
-//     /**
-//      * The file name of the generated avsc file.
-//      *
-//      * default: "<model-name>.avsc"
-//      */
-//     avscFileName?: string
-//   }[]
-//   /**
-//    * The schema output folder, relative to the current working
-//    * directory.
-//    */
-//   outDir?: string
-// }
-
 export type SchemaModelItem = {
   jsonSchema: JSONSchema7
   options?: IConvertationOptions
@@ -91,5 +69,3 @@ export type Config = {
   outDir?: string,
 	models: SchemaModel
 }
-
-export type Logger = Pick<typeof console, 'debug' | 'log' | 'info' | 'warn' | 'error'>

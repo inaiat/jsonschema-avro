@@ -7,7 +7,7 @@ Converts JSON Schema definitions into Avro Schema definitions.
 
 ## Install
 
-    npm install json-schema-to-avro
+    npm install @inaiat/jsonschema-avro
 
 ## Consume
 
@@ -37,6 +37,12 @@ Please ensure that the input JSON schema is dereferenced so that all external re
 ## Test
 
     npm test
+
+## ESM Only
+
+This package only supports to be directly imported in a ESM context.
+
+For informations on how to use it in a CommonJS context, please check [this page](https://gist.github.com/ShogunPanda/fe98fd23d77cdfb918010dbc42f4504d).
 
 ## TODO
 

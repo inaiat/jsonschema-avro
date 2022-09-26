@@ -1,5 +1,5 @@
 {
-  "name": "json-schema-to-avro",
+  "name": "@inaiat/jsonschema-avro",
   "description": "Convert JSON Schema into Apache Avro schema",
   "license": "MIT",
   "author": "Inaiat",
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/inaiat/jsonschema-avro/issues"
   },
-  "version": "1.1.0",
+  "version": "1.0.0",
   "main": "dist/index.js",
   "bin": "dist/bin/cli.js",
   "types": "dist/index.d.ts",
