@@ -1,8 +1,9 @@
 #!/usr/bin/env ts-node-esm
 
-import { Logger, parseArgs } from './utils.js';
+import { parseArgs } from '../avro-gen/parser.js';
 
-import { loadConfig, writeSchemas } from './avro-schema-gen.js';
+import { loadConfig, writeSchemas } from '../avro-gen/avro-schema-gen.js';
+import { Logger } from '../avro-gen/types.js';
 
 async function jsonSchemaAvroGenerator(
   processArgv: string[],

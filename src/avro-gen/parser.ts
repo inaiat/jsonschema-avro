@@ -1,7 +1,5 @@
 import yargs, { Argv } from 'yargs';
 
-export type Logger = Pick<typeof console, 'debug' | 'log' | 'info' | 'warn' | 'error'>
-
 const validCommands = ['generate', 'print'] as const
 type Command = typeof validCommands[number]
 

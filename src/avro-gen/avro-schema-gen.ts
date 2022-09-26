@@ -1,5 +1,5 @@
 import { Config } from '../types.js';
-import { Logger } from './utils.js'
+import { Logger } from './types.js'
 import * as path from 'node:path'
 import { convert } from '../index.js';
 import { promises as fs } from 'node:fs'
