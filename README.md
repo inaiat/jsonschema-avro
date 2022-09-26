@@ -39,30 +39,18 @@ const avro = convert(inJson)
 
 ```ts
 import type { Config } from '@inaiat/jsonschema-avro'
-import { userDtoSchema } from './src/mymodel/user.model.js'
+import { myDto } from './src/mymodel/myjsonschema.js'
 
 const config: Config = {
   outDir: 'dist/avro-schemas',
   models: {
     user: {
-      jsonSchema: userDtoSchema,
+      jsonSchema: myDto,
     },
   },
 }
 
 export default config
-```
-
-- We can use a lib, like [typebox](https://github.com/sinclairzx81/typebox), to build our json schema and use directly on `jsonSchema` field. 
-```ts
-import type { Static} from '@sinclair/typebox'
-import { Type } from '@sinclair/typebox'
-
-export const userDtoSchema = Type.Object({
-  id: Type.Optional(Type.String({ maxLength: 22 })),
-  name: Type.String({ maxLength: 100, minLength: 10 }),
-  phone: Type.String({ maxLength: 20, minLength: 8 }),
-}, { $id: 'userDto' })
 ```
 
 - finally add the generate script to your package.json and run it
@@ -75,6 +63,34 @@ export const userDtoSchema = Type.Object({
     }
   }
 
+- [Typebox](https://github.com/sinclairzx81/typebox). We can use some library that generates json schema and use directly on `jsonSchema` field.
+```ts
+// src/user-dto.ts
+import type { Static} from '@sinclair/typebox'
+import { Type } from '@sinclair/typebox'
+
+export const userDtoSchema = Type.Object({
+  id: Type.Optional(Type.String({ maxLength: 22 })),
+  name: Type.String({ maxLength: 100, minLength: 10 }),
+  phone: Type.String({ maxLength: 20, minLength: 8 }),
+}, { $id: 'userDto' })
+
+import type { Config } from '@inaiat/jsonschema-avro'
+import { userDtoSchema } from './src/usr-dto.js'
+
+//json-schema-avro.mts
+const config: Config = {
+  outDir: 'dist/avro-schemas',
+  models: {
+    user: {
+      jsonSchema: userDtoSchema,
+    },
+  },
+}
+
+export default config
+```
+
 ## Configuration
 
 `Json Schema to Avro` requires a configuration file written in TypeScript, to ensure the models have applied the decorators accordingly to read the required metadata.
@@ -86,8 +102,6 @@ Additionally, an output directory `outDir` can be declared as seen above. If it 
 ### Locating config not in root
 
 By default, `Json Schema to Avro` will check the current working directory for the file `json-schema-avro.mts`. If your config is located in a different folder, pass it to the program using the flag `--config <path>` or `-c <path>`.
-
-Please ensure that the input JSON schema is dereferenced so that all external references have been resolved. [json-schema-ref-parser](https://www.npmjs.com/package/json-schema-ref-parser) can do this, prior to using this module.
 
 ## Test
 
